@@ -311,15 +311,8 @@ enum
     {
         state_ = kCCScrollLayerStateSliding;
         
-        // Avoid jerk after state change.
-//        if (isHorizontal_ == YES) {
-//            startSwipe_ = touchPoint.x;
-//        } else {
-//            startSwipe_ = touchPoint.y;
-//        }
-        
         startSwipe_ = cpvsub(self.position, touchPoint);
-        LOG_EXPR(touchPoint);
+
         [self cancelAndStoleTouch: touch withEvent: event];
     }
     
@@ -332,10 +325,8 @@ enum
             pointX = (-(currentScreen_-1)*scrollDistance_)+(touchPoint.x-startSwipe_.x);
         } else {
             pointY = ((currentScreen_-1)*scrollDistance_)+(touchPoint.y+startSwipe_.y);
-            self.position = CGPointMake(self.position.x, pointY);
         }
-        //self.position = ccp(pointX,pointY);
-        LOG_EXPR(self.position);
+        self.position = ccp(pointX,pointY);
     }
 }
 
