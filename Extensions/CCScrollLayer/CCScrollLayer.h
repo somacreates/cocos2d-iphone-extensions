@@ -75,10 +75,14 @@
     // is horizontal, else is vertical.
     BOOL isHorizontal_;
     
+    // whether we snap to a page or not on touch end
+    BOOL snapToPage_;
+    
 }
 @property(readwrite, assign) CGFloat minimumTouchLengthToSlide;
 @property(readwrite, assign) CGFloat minimumTouchLengthToChangePage;
 @property(readwrite, assign) BOOL showPagesIndicator;
+@property(readwrite, assign) BOOL snapToPage;
 @property(readonly) int totalScreens;
 @property(readonly) int currentScreen;
 @property(readonly) BOOL isHorizontal;

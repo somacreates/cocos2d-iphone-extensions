@@ -61,6 +61,7 @@ enum
 @synthesize currentScreen = currentScreen_;
 @synthesize showPagesIndicator = showPagesIndicator_;
 @synthesize isHorizontal = isHorizontal_;
+@synthesize snapToPage = snapToPage_;
 
 +(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset
 {
@@ -91,6 +92,9 @@ enum
         
         // Horizontal
         isHorizontal_ = YES;
+        
+        // snapToPage
+        snapToPage_ = YES;
         
         // Loop through the array and add the screens
         int i = 0;
@@ -138,6 +142,9 @@ enum
 
         // Vertical
         isHorizontal_ = NO;
+        
+        // snapToPage
+        snapToPage_ = YES;
         
         // Loop through the array and add the screens
         int i = 0;
@@ -311,9 +318,8 @@ enum
 //            startSwipe_ = touchPoint.y;
 //        }
         
-        startSwipe_ = touchPoint;
-        
-        
+        startSwipe_ = cpvsub(self.position, touchPoint);
+        LOG_EXPR(touchPoint);
         [self cancelAndStoleTouch: touch withEvent: event];
     }
     
@@ -325,37 +331,40 @@ enum
         if (isHorizontal_ == YES) {
             pointX = (-(currentScreen_-1)*scrollDistance_)+(touchPoint.x-startSwipe_.x);
         } else {
-            pointY = ((currentScreen_-1)*scrollDistance_)+(touchPoint.y-startSwipe_.y);
+            pointY = ((currentScreen_-1)*scrollDistance_)+(touchPoint.y+startSwipe_.y);
+            self.position = CGPointMake(self.position.x, pointY);
         }
-        self.position = ccp(pointX,pointY);
+        //self.position = ccp(pointX,pointY);
+        LOG_EXPR(self.position);
     }
-    
 }
 
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {
-    CGPoint touchPoint = [touch locationInView:[touch view]];
-    touchPoint = [[CCDirector sharedDirector] convertToGL:touchPoint];
-    
-    int offsetLoc = 0;
-    if (isHorizontal_ == YES) {
-        offsetLoc = (touchPoint.x - startSwipe_.x);
-    } else {
-        offsetLoc = -(touchPoint.y - startSwipe_.y);
-    }
-    
-    
-    if ( offsetLoc < -self.minimumTouchLengthToChangePage && (currentScreen_+1) <= totalScreens_ )
-    {
-        [self moveToPage: currentScreen_+1];
-    }
-    else if ( offsetLoc > self.minimumTouchLengthToChangePage && (currentScreen_-1) > 0 )
-    {
-        [self moveToPage: currentScreen_-1];
-    }
-    else
-    {
-        [self moveToPage:currentScreen_];
+    if (snapToPage_) {
+        CGPoint touchPoint = [touch locationInView:[touch view]];
+        touchPoint = [[CCDirector sharedDirector] convertToGL:touchPoint];
+        
+        int offsetLoc = 0;
+        if (isHorizontal_ == YES) {
+            offsetLoc = (touchPoint.x - startSwipe_.x);
+        } else {
+            offsetLoc = -(touchPoint.y - startSwipe_.y);
+        }
+        
+        
+        if ( offsetLoc < -self.minimumTouchLengthToChangePage && (currentScreen_+1) <= totalScreens_ )
+        {
+            [self moveToPage: currentScreen_+1];
+        }
+        else if ( offsetLoc > self.minimumTouchLengthToChangePage && (currentScreen_-1) > 0 )
+        {
+            [self moveToPage: currentScreen_-1];
+        }
+        else
+        {
+            [self moveToPage:currentScreen_];
+        }
     }
 }
 
