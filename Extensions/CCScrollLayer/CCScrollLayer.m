@@ -356,6 +356,43 @@ enum
         {
             [self moveToPage:currentScreen_];
         }
+    } else {
+        // Get the highest and lowest positioned layers
+        CCNode *lowest = nil;
+        CCNode *highest = nil;
+        for (CCNode *node in self.children) {
+            if (node.position.y < (lowest ? lowest.position.y : MAXFLOAT)) {
+                lowest = node;
+            }
+            
+            if (node.position.y > (highest ? highest.position.y : -MAXFLOAT)) {
+                highest = node;
+            }
+        }
+        
+        NSAssert(lowest && highest,
+                 @"Unable to find the lowest and highest layers");
+        
+        
+        // Now check and see if we are out of bounds...
+        
+        // If our lowest layer is above 0 + (/ lowerlayerheight 2) then
+        // move to lowerlayerheight / 2
+        
+        if (self.position.y < self.contentSize.height - (highest.contentSize.height / 2.0f)) {
+            CGPoint newPosition = ccp(self.position.x, 
+                                 self.contentSize.height - (highest.contentSize.height));
+            
+            [self runAction:[CCMoveTo actionWithDuration:0.3 
+                                                position:newPosition]];
+        } else if (self.position.y > 0.0f - lowest.position.y) {
+            CGPoint newPosition = ccp(self.position.x, 
+                                 -lowest.position.y + (lowest.contentSize.height / 2.0f));
+            
+            [self runAction:[CCMoveTo actionWithDuration:0.3 
+                                                position:newPosition]];
+        }
+        
     }
 }
 
