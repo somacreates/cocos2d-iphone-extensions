@@ -64,12 +64,12 @@ enum
 @synthesize snapToPage = snapToPage_;
 @synthesize delegate;
 
-+(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset
++(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset  touchPriority:(int)touchPriority
 {
-    return [[[self alloc] initWithLayers: layers widthOffset:offset] autorelease];
+    return [[[self alloc] initWithLayers: layers widthOffset:offset touchPriority:touchPriority] autorelease];
 }
 
--(id) initWithLayers:(NSArray *)layers widthOffset: (int) offset
+-(id) initWithLayers:(NSArray *)layers widthOffset: (int) offset touchPriority:(int)touchPriority
 {
     if ( (self = [super init]) )
     {
@@ -97,6 +97,8 @@ enum
         // snapToPage
         snapToPage_ = YES;
         
+        touchPriority_ = touchPriority;
+        
         // Loop through the array and add the screens
         int i = 0;
         for (CCLayer *l in layers)
@@ -114,12 +116,12 @@ enum
     return self;
 }
 
-+(id) nodeWithLayers:(NSArray *)layers heightOffset: (int) offset
++(id) nodeWithLayers:(NSArray *)layers heightOffset: (int) offset  touchPriority:(int)touchPriority
 {
-    return [[[self alloc] initWithLayers: layers heightOffset:offset] autorelease];
+    return [[[self alloc] initWithLayers: layers heightOffset:offset touchPriority:touchPriority] autorelease];
 }
 
--(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset
+-(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset  touchPriority:(int)touchPriority
 {
     if ( (self = [super init]) )
     {
@@ -146,6 +148,8 @@ enum
         
         // snapToPage
         snapToPage_ = YES;
+        
+        touchPriority_ = touchPriority;
         
         // Loop through the array and add the screens
         int i = 0;
@@ -179,7 +183,7 @@ enum
 // Register with more priority than CCMenu's but don't swallow touches
 -(void) registerWithTouchDispatcher
 {
-    [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:kCCMenuTouchPriority - 1 swallowsTouches:NO];
+    [[CCTouchDispatcher sharedDispatcher] addTargetedDelegate:self priority:touchPriority_ swallowsTouches:NO];
 }
 
 - (void) visit
@@ -324,8 +328,8 @@ enum
         if (fabsf(touchPoint.x - startSwipe_.x) >= self.minimumTouchLengthToSlide) {
             [[CCTouchDispatcher sharedDispatcher] touchesCancelled: [NSSet setWithObject: touch] withEvent:event];
             
-            if ([self.delegate respondsToSelector:@selector(scrollLayerScrollingStartedHorizontal:)]) {
-                [self.delegate scrollLayerScrollingStartedHorizontal: self];
+            if ([self.delegate respondsToSelector:@selector(scrollLayer:scrollingStartedHorizontalWithTouch:)]) {
+                [self.delegate scrollLayer:self scrollingStartedHorizontalWithTouch:touch];
             }
             return;
         }
@@ -346,8 +350,8 @@ enum
 
         [self cancelAndStoleTouch: touch withEvent: event];
         
-        if ([self.delegate respondsToSelector:@selector(scrollLayerScrollingStartedVertical:)]) {
-            [self.delegate scrollLayerScrollingStartedVertical: self];
+        if ([self.delegate respondsToSelector:@selector(scrollLayer:scrollingStartedVerticalWithTouch:)]) {
+            [self.delegate scrollLayer:self scrollingStartedVerticalWithTouch:touch];
         }
     }
     

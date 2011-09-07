@@ -38,9 +38,11 @@
 /** Called when scroll layer begins scrolling.
  * Usefull to cancel CCTouchDispatcher standardDelegates.
  */
-- (void) scrollLayerScrollingStartedHorizontal:(CCScrollLayer *) sender;
+- (void) scrollLayer:(CCScrollLayer*)sender 
+scrollingStartedHorizontalWithTouch:(UITouch*)touch;
 
-- (void) scrollLayerScrollingStartedVertical:(CCScrollLayer *) sender;
+- (void) scrollLayer:(CCScrollLayer*)sender 
+scrollingStartedVerticalWithTouch:(UITouch*)touch;
 
 
 @end
@@ -94,6 +96,9 @@
     // Personal Hack
     BOOL didStartDraggingVertical_;
     
+    // 'Nother
+    int touchPriority_;
+    
 }
 @property(readwrite, assign) CGFloat minimumTouchLengthToSlide;
 @property(readwrite, assign) CGFloat minimumTouchLengthToChangePage;
@@ -105,11 +110,11 @@
 @property(readonly) BOOL isHorizontal;
 
 // Horizontal scrolling
-+(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset;
--(id) initWithLayers:(NSArray *)layers widthOffset: (int) offset;
++(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset touchPriority:(int)touchPriority;
+-(id) initWithLayers:(NSArray *)layers widthOffset: (int) offset touchPriority:(int)touchPriority;
 
 // Vertical scrolling
-+(id) nodeWithLayers:(NSArray *)layers heightOffset: (int) offset;
--(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset;
++(id) nodeWithLayers:(NSArray *)layers heightOffset: (int) offset touchPriority:(int)touchPriority;
+-(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset touchPriority:(int)touchPriority;
 
 @end
