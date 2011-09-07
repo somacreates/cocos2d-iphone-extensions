@@ -31,19 +31,17 @@
 #import "cocos2d.h"
 
 @class CCScrollLayer;
-@protocol CCScrollLayerDelegate
+@protocol CCScrollLayerDelegate <NSObject>
 
 @optional
 
 /** Called when scroll layer begins scrolling.
  * Usefull to cancel CCTouchDispatcher standardDelegates.
  */
-- (void) scrollLayerScrollingStarted:(CCScrollLayer *) sender;
+- (void) scrollLayerScrollingStartedHorizontal:(CCScrollLayer *) sender;
 
-/** Called at the end of moveToPage:
- * Doesn't get called in selectPage:
- */
-- (void) scrollLayer: (CCScrollLayer *) sender scrolledToPageNumber: (int) page;
+- (void) scrollLayerScrollingStartedVertical:(CCScrollLayer *) sender;
+
 
 @end
 
@@ -92,6 +90,9 @@
     
     // whether we snap to a page or not on touch end
     BOOL snapToPage_;
+    
+    // Personal Hack
+    BOOL didStartDraggingVertical_;
     
 }
 @property(readwrite, assign) CGFloat minimumTouchLengthToSlide;

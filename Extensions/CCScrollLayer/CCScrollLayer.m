@@ -140,7 +140,7 @@ enum
         
         // offset added to show preview of next/previous screens
         scrollDistance_ = offset;
-
+        
         // Vertical
         isHorizontal_ = NO;
         
@@ -163,6 +163,16 @@ enum
     }
     return self;
 }
+
+-(CGRect) layerRect {
+    CGRect r = self.boundingBox;
+	r = CGRectMake(self.position.x - r.size.width , 
+                   0.0f, 
+                   r.size.width * 2.0f, 
+                   r.size.height);
+    return r;
+}
+
 
 #pragma mark CCLayer Methods ReImpl
 
@@ -280,14 +290,15 @@ enum
 {
     CGPoint touchPoint = [touch locationInView:[touch view]];
     touchPoint = [[CCDirector sharedDirector] convertToGL:touchPoint];
-        
-//    if (isHorizontal_ == YES) {
-//        startSwipe_ = touchPoint.x;
-//    } else {
-//        startSwipe_ = touchPoint.y;
-//    }
+    
+    // If we are not in the bounds of our layer then we early exit...
+    if (!CGRectContainsPoint([self layerRect], touchPoint)) {
+        return NO;
+    }
     
     startSwipe_ = touchPoint;
+    
+    didStartDraggingVertical_ = NO;
     
     state_ = kCCScrollLayerStateIdle;
     return YES;
@@ -305,6 +316,22 @@ enum
         moveDistance = touchPoint.y-startSwipe_.y;
     }
     
+    
+    // Quick hack for our game... 
+    // If we have a vertical move we want to claim it. If not we want to
+    // let it behave as normal...
+    if (!isHorizontal_ && !didStartDraggingVertical_) {
+        if (fabsf(touchPoint.x - startSwipe_.x) >= self.minimumTouchLengthToSlide) {
+            [[CCTouchDispatcher sharedDispatcher] touchesCancelled: [NSSet setWithObject: touch] withEvent:event];
+            
+            if ([self.delegate respondsToSelector:@selector(scrollLayerScrollingStartedHorizontal:)]) {
+                [self.delegate scrollLayerScrollingStartedHorizontal: self];
+            }
+            return;
+        }
+    }
+    
+    
     // If finger is dragged for more distance then minimum - start sliding and cancel pressed buttons.
     // Of course only if we not already in sliding mode
     if ( (state_ != kCCScrollLayerStateSliding)
@@ -312,14 +339,16 @@ enum
     {
         state_ = kCCScrollLayerStateSliding;
         
+        didStartDraggingVertical_ = YES;
+        
         startSwipe_ = cpvsub(self.position, touchPoint);
+        
 
         [self cancelAndStoleTouch: touch withEvent: event];
         
-        if ([self.delegate respondsToSelector:@selector(scrollLayerScrollingStarted:)])
-		{
-			[self.delegate scrollLayerScrollingStarted: self];
-		}
+        if ([self.delegate respondsToSelector:@selector(scrollLayerScrollingStartedVertical:)]) {
+            [self.delegate scrollLayerScrollingStartedVertical: self];
+        }
     }
     
     if (state_ == kCCScrollLayerStateSliding) {
@@ -387,13 +416,13 @@ enum
         
         if (self.position.y < self.contentSize.height - (highest.contentSize.height / 2.0f)) {
             CGPoint newPosition = ccp(self.position.x, 
-                                 self.contentSize.height - (highest.contentSize.height));
+                                      self.contentSize.height - (highest.contentSize.height));
             
             [self runAction:[CCMoveTo actionWithDuration:0.3 
                                                 position:newPosition]];
         } else if (self.position.y > 0.0f - lowest.position.y) {
             CGPoint newPosition = ccp(self.position.x, 
-                                 -lowest.position.y + (lowest.contentSize.height / 2.0f));
+                                      -lowest.position.y + (lowest.contentSize.height / 2.0f));
             
             [self runAction:[CCMoveTo actionWithDuration:0.3 
                                                 position:newPosition]];
