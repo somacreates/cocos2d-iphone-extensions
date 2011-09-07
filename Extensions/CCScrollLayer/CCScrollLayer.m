@@ -62,6 +62,7 @@ enum
 @synthesize showPagesIndicator = showPagesIndicator_;
 @synthesize isHorizontal = isHorizontal_;
 @synthesize snapToPage = snapToPage_;
+@synthesize delegate;
 
 +(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset
 {
@@ -314,6 +315,11 @@ enum
         startSwipe_ = cpvsub(self.position, touchPoint);
 
         [self cancelAndStoleTouch: touch withEvent: event];
+        
+        if ([self.delegate respondsToSelector:@selector(scrollLayerScrollingStarted:)])
+		{
+			[self.delegate scrollLayerScrollingStarted: self];
+		}
     }
     
     if (state_ == kCCScrollLayerStateSliding) {

@@ -30,7 +30,22 @@
 #import <Foundation/Foundation.h>
 #import "cocos2d.h"
 
-#ifndef __MAC_OS_X_VERSION_MAX_ALLOWED
+@class CCScrollLayer;
+@protocol CCScrollLayerDelegate
+
+@optional
+
+/** Called when scroll layer begins scrolling.
+ * Usefull to cancel CCTouchDispatcher standardDelegates.
+ */
+- (void) scrollLayerScrollingStarted:(CCScrollLayer *) sender;
+
+/** Called at the end of moveToPage:
+ * Doesn't get called in selectPage:
+ */
+- (void) scrollLayer: (CCScrollLayer *) sender scrolledToPageNumber: (int) page;
+
+@end
 
 /*
  It is a very clean and elegant subclass of CCLayer that lets you pass-in an array
@@ -83,6 +98,7 @@
 @property(readwrite, assign) CGFloat minimumTouchLengthToChangePage;
 @property(readwrite, assign) BOOL showPagesIndicator;
 @property(readwrite, assign) BOOL snapToPage;
+@property(readwrite, assign) id <CCScrollLayerDelegate>delegate;
 @property(readonly) int totalScreens;
 @property(readonly) int currentScreen;
 @property(readonly) BOOL isHorizontal;
@@ -96,5 +112,3 @@
 -(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset;
 
 @end
-
-#endif
