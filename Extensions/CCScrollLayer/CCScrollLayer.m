@@ -299,6 +299,17 @@ enum
     if (!CGRectContainsPoint([self layerRect], touchPoint)) {
         return NO;
     }
+ 
+    // We need to have a way to indicate that we have not moved a great
+    // distance. What we will do is take the time here. We will run an action
+    // then that once it is done will see if we have moved a certain distance.
+    // If we have then we cause the decoration to "jump" to the cake area. We
+    // won't do that here though. We will first cancel our touch from here and
+    // then notify our delegate that we have our tapdown event without a
+    // significant movement. If we have not moved a significant amount then
+    // we will continue as normal.
+    
+    
     
     startSwipe_ = touchPoint;
     
