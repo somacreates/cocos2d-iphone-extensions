@@ -44,7 +44,8 @@ scrollingStartedHorizontalWithTouch:(UITouch*)touch;
 - (void) scrollLayer:(CCScrollLayer*)sender 
 scrollingStartedVerticalWithTouch:(UITouch*)touch;
 
--(void) scrollLayerDidHaveInsignificantMovement:(CCScrollLayer *)sender;
+-(void) scrollLayerDidHaveInsignificantMovement:(CCScrollLayer *)sender 
+                                     atPosition:(CGPoint)position;
 
 @end
 

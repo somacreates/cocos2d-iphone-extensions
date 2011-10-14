@@ -292,11 +292,11 @@ enum
 -(void) insignificantMovementCheck {
     CGFloat distanceToCheck = ccpDistance(startTouch_, lastTouch_);
     
-    if (distanceToCheck < (iPhonep() ? 20.0f : 45.0f)) {
+    if (distanceToCheck < 20.0f) {
         cancelNextTouch_ = YES;
         
-        if ([self.delegate respondsToSelector:@selector(scrollLayerDidHaveInsignificantMovement:)]) {
-            [self.delegate scrollLayerDidHaveInsignificantMovement:self];
+        if ([self.delegate respondsToSelector:@selector(scrollLayerDidHaveInsignificantMovement:atPosition:)]) {
+            [self.delegate scrollLayerDidHaveInsignificantMovement:self atPosition:lastTouch_];
         }
     }
 }
