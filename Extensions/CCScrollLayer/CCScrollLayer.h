@@ -44,6 +44,7 @@ scrollingStartedHorizontalWithTouch:(UITouch*)touch;
 - (void) scrollLayer:(CCScrollLayer*)sender 
 scrollingStartedVerticalWithTouch:(UITouch*)touch;
 
+-(void) scrollLayerDidHaveInsignificantMovement:(CCScrollLayer *)sender;
 
 @end
 
@@ -74,6 +75,15 @@ scrollingStartedVerticalWithTouch:(UITouch*)touch;
     
     // The x coord of initial point the user starts their swipe.
     CGPoint startSwipe_;
+    
+    // The touch position for the last touch began.
+    CGPoint startTouch_;
+    
+    // The last touch position recorded. For all touch began, moved and ended.
+    CGPoint lastTouch_;
+    
+    // Will cancel our next touch move and touch end.
+    BOOL cancelNextTouch_;
     
     // For what distance user must slide finger to start scrolling menu.
     CGFloat minimumTouchLengthToSlide_;

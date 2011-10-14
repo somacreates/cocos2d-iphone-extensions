@@ -31,6 +31,7 @@
 
 #import "CCScrollLayer.h"
 #import "CCGL.h"
+#import "SCUtility.h"
 
 enum
 {
@@ -288,6 +289,18 @@ enum
     [self claimTouch: touch];
 }
 
+-(void) insignificantMovementCheck {
+    CGFloat distanceToCheck = ccpDistance(startTouch_, lastTouch_);
+    
+    if (distanceToCheck < (iPhonep() ? 20.0f : 45.0f)) {
+        cancelNextTouch_ = YES;
+        
+        if ([self.delegate respondsToSelector:@selector(scrollLayerDidHaveInsignificantMovement:)]) {
+            [self.delegate scrollLayerDidHaveInsignificantMovement:self];
+        }
+    }
+}
+
 #pragma mark Touches
 
 -(BOOL) ccTouchBegan:(UITouch *)touch withEvent:(UIEvent *)event
@@ -299,30 +312,39 @@ enum
     if (!CGRectContainsPoint([self layerRect], touchPoint)) {
         return NO;
     }
- 
-    // We need to have a way to indicate that we have not moved a great
-    // distance. What we will do is take the time here. We will run an action
-    // then that once it is done will see if we have moved a certain distance.
-    // If we have then we cause the decoration to "jump" to the cake area. We
-    // won't do that here though. We will first cancel our touch from here and
-    // then notify our delegate that we have our tapdown event without a
-    // significant movement. If we have not moved a significant amount then
-    // we will continue as normal.
-    
-    
     
     startSwipe_ = touchPoint;
+    
+    startTouch_ = touchPoint;
+    
+    lastTouch_ = touchPoint;
     
     didStartDraggingVertical_ = NO;
     
     state_ = kCCScrollLayerStateIdle;
+    
+    
+    id minDistanceCheck = [CCSequence actions:
+                           [CCDelayTime actionWithDuration:0.5f],
+                           [CCCallFunc actionWithTarget:self selector:@selector(insignificantMovementCheck)],
+                           nil];
+    
+    [self runAction:minDistanceCheck];
+    
     return YES;
 }
 
 - (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    if (cancelNextTouch_) {
+        cancelNextTouch_ = NO;
+        [[CCTouchDispatcher sharedDispatcher] touchesCancelled: [NSSet setWithObject: touch] withEvent:event];
+    }
+    
     CGPoint touchPoint = [touch locationInView:[touch view]];
     touchPoint = [[CCDirector sharedDirector] convertToGL:touchPoint];
+    
+    lastTouch_ = touchPoint;
     
     int moveDistance = 0;
     if (isHorizontal_ == YES) {
@@ -382,9 +404,16 @@ enum
 
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    if (cancelNextTouch_) {
+        cancelNextTouch_ = NO;
+        [[CCTouchDispatcher sharedDispatcher] touchesCancelled: [NSSet setWithObject: touch] withEvent:event];
+    }
+    
     if (snapToPage_) {
         CGPoint touchPoint = [touch locationInView:[touch view]];
         touchPoint = [[CCDirector sharedDirector] convertToGL:touchPoint];
+        
+        lastTouch_ = touchPoint;
         
         int offsetLoc = 0;
         if (isHorizontal_ == YES) {
