@@ -39,6 +39,8 @@ enum
     kCCScrollLayerStateSliding,
 };
 
+static NSInteger const MIN_DISTANCE_ACTION_TAG = 0x37462;
+
 @interface CCTouchDispatcher (targetedHandlersGetter)
 
 - (NSMutableArray *) targetedHandlers;
@@ -324,10 +326,12 @@ enum
     state_ = kCCScrollLayerStateIdle;
     
     
-    id minDistanceCheck = [CCSequence actions:
-                           [CCDelayTime actionWithDuration:0.5f],
-                           [CCCallFunc actionWithTarget:self selector:@selector(insignificantMovementCheck)],
-                           nil];
+    CCAction *minDistanceCheck = [CCSequence actions:
+                                  [CCDelayTime actionWithDuration:0.5f],
+                                  [CCCallFunc actionWithTarget:self selector:@selector(insignificantMovementCheck)],
+                                  nil];
+    
+    minDistanceCheck.tag = MIN_DISTANCE_ACTION_TAG;
     
     [self runAction:minDistanceCheck];
     
@@ -336,6 +340,7 @@ enum
 
 - (void)ccTouchMoved:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    
     if (cancelNextTouch_) {
         cancelNextTouch_ = NO;
         [[CCTouchDispatcher sharedDispatcher] touchesCancelled: [NSSet setWithObject: touch] withEvent:event];
@@ -380,7 +385,7 @@ enum
         
         startSwipe_ = cpvsub(self.position, touchPoint);
         
-
+        
         [self cancelAndStoleTouch: touch withEvent: event];
         
         if ([self.delegate respondsToSelector:@selector(scrollLayer:scrollingStartedVerticalWithTouch:)]) {
@@ -404,6 +409,26 @@ enum
 
 - (void)ccTouchEnded:(UITouch *)touch withEvent:(UIEvent *)event
 {
+    [self stopActionByTag:MIN_DISTANCE_ACTION_TAG];
+    
+    
+    if (!cancelNextTouch_) {
+        CGPoint touchPoint = [touch locationInView:[touch view]];
+        touchPoint = [[CCDirector sharedDirector] convertToGL:touchPoint];
+        lastTouch_ = touchPoint;
+        
+        CGFloat distanceToCheck = ccpDistance(startTouch_, lastTouch_);
+        
+        if (distanceToCheck < 20.0f) {
+            //        cancelNextTouch_ = YES;
+            
+            if ([self.delegate respondsToSelector:@selector(scrollLayerDidHaveInsignificantMovement:atPosition:)]) {
+                [self.delegate scrollLayerDidHaveInsignificantMovement:self atPosition:lastTouch_];
+            }
+        }
+    }
+    
+    
     if (cancelNextTouch_) {
         cancelNextTouch_ = NO;
         [[CCTouchDispatcher sharedDispatcher] touchesCancelled: [NSSet setWithObject: touch] withEvent:event];
