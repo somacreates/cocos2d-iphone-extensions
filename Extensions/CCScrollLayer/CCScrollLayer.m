@@ -67,12 +67,12 @@ static NSInteger const MIN_DISTANCE_ACTION_TAG = 0x37462;
 @synthesize snapToPage = snapToPage_;
 @synthesize delegate;
 
-+(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset  touchPriority:(int)touchPriority
++(id) nodeWithLayers:(NSArray *)layers widthOffset: (float) offset  touchPriority:(int)touchPriority
 {
     return [[[self alloc] initWithLayers: layers widthOffset:offset touchPriority:touchPriority] autorelease];
 }
 
--(id) initWithLayers:(NSArray *)layers widthOffset: (int) offset touchPriority:(int)touchPriority
+-(id) initWithLayers:(NSArray *)layers widthOffset: (float) offset touchPriority:(int)touchPriority
 {
     if ( (self = [super init]) )
     {
@@ -119,12 +119,12 @@ static NSInteger const MIN_DISTANCE_ACTION_TAG = 0x37462;
     return self;
 }
 
-+(id) nodeWithLayers:(NSArray *)layers heightOffset: (int) offset  touchPriority:(int)touchPriority
++(id) nodeWithLayers:(NSArray *)layers heightOffset: (float) offset  touchPriority:(int)touchPriority
 {
     return [[[self alloc] initWithLayers: layers heightOffset:offset touchPriority:touchPriority] autorelease];
 }
 
--(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset  touchPriority:(int)touchPriority
+-(id) initWithLayers:(NSArray *)layers heightOffset: (float) offset  touchPriority:(int)touchPriority
 {
     if ( (self = [super init]) )
     {

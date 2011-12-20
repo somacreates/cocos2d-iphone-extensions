@@ -121,11 +121,11 @@ scrollingStartedVerticalWithTouch:(UITouch*)touch;
 @property(readonly) BOOL isHorizontal;
 
 // Horizontal scrolling
-+(id) nodeWithLayers:(NSArray *)layers widthOffset: (int) offset touchPriority:(int)touchPriority;
--(id) initWithLayers:(NSArray *)layers widthOffset: (int) offset touchPriority:(int)touchPriority;
++(id) nodeWithLayers:(NSArray *)layers widthOffset: (float) offset touchPriority:(int)touchPriority;
+-(id) initWithLayers:(NSArray *)layers widthOffset: (float) offset touchPriority:(int)touchPriority;
 
 // Vertical scrolling
-+(id) nodeWithLayers:(NSArray *)layers heightOffset: (int) offset touchPriority:(int)touchPriority;
--(id) initWithLayers:(NSArray *)layers heightOffset: (int) offset touchPriority:(int)touchPriority;
++(id) nodeWithLayers:(NSArray *)layers heightOffset: (float) offset touchPriority:(int)touchPriority;
+-(id) initWithLayers:(NSArray *)layers heightOffset: (float) offset touchPriority:(int)touchPriority;
 
 @end
