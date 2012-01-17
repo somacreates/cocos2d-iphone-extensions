@@ -115,7 +115,7 @@ scrollingStartedVerticalWithTouch:(UITouch*)touch;
 @property(readwrite, assign) CGFloat minimumTouchLengthToChangePage;
 @property(readwrite, assign) BOOL showPagesIndicator;
 @property(readwrite, assign) BOOL snapToPage;
-@property(readwrite, assign) id <CCScrollLayerDelegate>delegate;
+@property(readwrite, unsafe_unretained) id <CCScrollLayerDelegate>delegate;
 @property(readonly) int totalScreens;
 @property(readonly) int currentScreen;
 @property(readonly) BOOL isHorizontal;
